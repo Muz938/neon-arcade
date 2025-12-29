@@ -2,6 +2,7 @@
 import { useGame } from "@/lib/GameContext";
 import { useState } from "react";
 import { Mail, Github, Chrome, Phone, ArrowRight, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Login() {
     const { signIn } = useGame();
@@ -13,7 +14,24 @@ export default function Login() {
         setIsLoading(provider);
         try {
             await signIn(provider);
-        } catch (e) {
+        } catch (e: any) {
+            toast.error(e.message || "OAuth failed. Check your browser/network.");
+            console.error(e);
+        } finally {
+            setIsLoading(null);
+        }
+    };
+
+    const handleGuestAccess = async () => {
+        setIsLoading("guest");
+        try {
+            const guestId = Math.random().toString(36).substring(2, 10);
+            const email = `guest_${guestId}@arcadenexus.ai`;
+            // Using a static but internal password for guest sessions
+            await signIn("password", { email, password: "guest-password-internal", flow: "signUp" });
+            toast.success("Guest link initialized!");
+        } catch (e: any) {
+            toast.error("Failed to initialize guest link.");
             console.error(e);
         } finally {
             setIsLoading(null);
@@ -26,11 +44,14 @@ export default function Login() {
         try {
             // Using password provider as simple email logic for now
             await signIn("password", { email, flow: "signIn" });
+            toast.success("Welcome back!");
         } catch (e) {
             // If doesn't exist, try signUp
             try {
                 await signIn("password", { email, flow: "signUp", password: "dummy-password-for-otp-logic" });
-            } catch (err) {
+                toast.success("Account created successfully!");
+            } catch (err: any) {
+                toast.error(err.message || "Failed to initialize neural link.");
                 console.error(err);
             }
         } finally {
@@ -58,6 +79,14 @@ export default function Login() {
                     CONTINUE WITH GOOGLE
                 </button>
 
+                <button
+                    onClick={handleGuestAccess}
+                    disabled={!!isLoading}
+                    className="w-full bg-zinc-900 border border-zinc-800 text-cyan-400 font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:border-cyan-500/50 transition-all disabled:opacity-50"
+                >
+                    {isLoading === "guest" ? <Loader2 className="w-5 h-5 animate-spin" /> : "GUEST ACCESS (QUICK START)"}
+                </button>
+
                 <div className="relative py-4">
                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-800"></div></div>
                     <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#050510] px-2 text-zinc-600 font-mono tracking-widest">or initialize via</span></div>
@@ -67,9 +96,9 @@ export default function Login() {
                 {!showEmailInput ? (
                     <button
                         onClick={() => setShowEmailInput(true)}
-                        className="w-full bg-zinc-900 border border-zinc-800 hover:border-cyan-500/50 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all font-black tracking-widest text-xs"
+                        className="w-full bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all font-black tracking-widest text-[10px] text-zinc-500"
                     >
-                        <Mail className="w-4 h-4 text-cyan-400" /> EMAIL & PASSWORD
+                        <Mail className="w-4 h-4" /> EMAIL & PASSWORD
                     </button>
                 ) : (
                     <form onSubmit={handleEmailSignIn} className="space-y-3 animate-in fade-in slide-in-from-top-2">
@@ -102,9 +131,9 @@ export default function Login() {
                 )}
 
                 <button
-                    className="w-full bg-zinc-900/50 border border-zinc-900 text-zinc-600 py-4 rounded-2xl flex items-center justify-center gap-3 grayscale opacity-50 cursor-not-allowed text-xs font-black tracking-widest"
+                    className="w-full bg-zinc-900/50 border border-zinc-900 text-zinc-600 py-4 rounded-2xl flex items-center justify-center gap-3 grayscale opacity-30 cursor-not-allowed text-[10px] font-black tracking-widest"
                 >
-                    <Phone className="w-4 h-4" /> PHONE (COMING SOON)
+                    <Phone className="w-4 h-4" /> SMS VERIFICATION (COMING SOON)
                 </button>
             </div>
 

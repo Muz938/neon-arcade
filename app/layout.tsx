@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     description: 'The ultimate futuristic multiplayer gaming platform',
 };
 
+import { Toaster } from 'sonner';
 import { ConvexClientProvider } from './ConvexClientProvider';
 
 export default function RootLayout({
@@ -24,6 +25,7 @@ export default function RootLayout({
                 <ConvexClientProvider>
                     <GameProvider>
                         {children}
+                        <Toaster position="bottom-right" theme="dark" />
                     </GameProvider>
                 </ConvexClientProvider>
             </body>

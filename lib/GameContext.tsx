@@ -28,6 +28,7 @@ interface GameContextType {
     profile: any;
     // Helper to ensure profile exists
     createProfile: () => Promise<void>;
+    updateStats: (args: { xp?: number; coins?: number; win?: boolean }) => Promise<void>;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -47,6 +48,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
     }, [isAuthenticated, profile, isLoading, createProfileMutation]);
 
+    const updateStatsMutation = useMutation(api.users.updateStats);
+
     const handleSignIn = async (provider: string, args: any = {}) => {
         try {
             await signIn(provider, args);
@@ -64,6 +67,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         await createProfileMutation({});
     };
 
+    const updateStats = async (args: { xp?: number; coins?: number; win?: boolean }) => {
+        await updateStatsMutation(args);
+    };
+
     return (
         <GameContext.Provider value={{
             isAuthenticated,
@@ -72,6 +79,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             signOut: handleSignOut,
             profile,
             createProfile,
+            updateStats,
         }}>
             {children}
         </GameContext.Provider>

@@ -1,5 +1,6 @@
 "use client";
 import TicTacToe from "@/components/games/TicTacToe";
+import Pong from "@/components/games/Pong";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Wifi } from "lucide-react";
 import { Suspense } from "react";
@@ -15,17 +16,8 @@ function GameContent({ gameId }: { gameId: string }) {
             case 'tictactoe':
                 return <TicTacToe mode={mode} onExit={() => router.push('/')} />;
             case 'pong':
+                return <Pong mode={mode} onExit={() => router.push('/')} />;
             case 'memory':
-                return (
-                    <div className="text-center p-10 glass-panel max-w-md mx-auto">
-                        <div className="text-6xl mb-6">🚧</div>
-                        <h1 className="text-2xl text-[var(--primary)] font-display mb-4">COMING SOON</h1>
-                        <p className="text-gray-400 mb-6">This game module is currently under development.</p>
-                        <button onClick={() => router.push('/')} className="btn-primary">
-                            Return to Hub
-                        </button>
-                    </div>
-                );
             default:
                 return (
                     <div className="text-center p-10 glass-panel max-w-md mx-auto">
@@ -55,8 +47,8 @@ function GameContent({ gameId }: { gameId: string }) {
                 <div className="flex items-center gap-2 text-xs font-mono">
                     <span className="text-gray-500">MODE:</span>
                     <span className={`px-2 py-1 rounded ${mode === 'online' ? 'bg-green-500/20 text-green-400' :
-                            mode === 'ai' ? 'bg-purple-500/20 text-purple-400' :
-                                'bg-blue-500/20 text-blue-400'
+                        mode === 'ai' ? 'bg-purple-500/20 text-purple-400' :
+                            'bg-blue-500/20 text-blue-400'
                         }`}>
                         {mode === 'online' && <Wifi size={12} className="inline mr-1" />}
                         {mode === 'ai' && '🤖 '}

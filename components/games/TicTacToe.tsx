@@ -2,6 +2,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X as XIcon, Circle, Trophy, User, RotateCcw } from "lucide-react";
+import { useGame } from "@/lib/GameContext";
 
 type Player = 'X' | 'O';
 type Board = (Player | null)[];
@@ -18,10 +19,29 @@ const WIN_LINES = [
 ];
 
 export default function TicTacToe({ mode, onExit }: TicTacToeProps) {
+    const { updateStats } = useGame();
     const [board, setBoard] = useState<Board>(Array(9).fill(null));
     const [currentTurn, setCurrentTurn] = useState<Player>('X');
     const [winner, setWinner] = useState<Player | 'draw' | null>(null);
     const [winningLine, setWinningLine] = useState<number[] | null>(null);
+    const [hasRewarded, setHasRewarded] = useState(false);
+
+    const handleRewards = useCallback(async (gameWinner: Player | 'draw') => {
+        if (hasRewarded || mode === 'local') return;
+        setHasRewarded(true);
+
+        if (gameWinner === 'X') {
+            await updateStats({ xp: 50, coins: 10, win: true });
+        } else if (gameWinner === 'O') {
+            await updateStats({ xp: 10, win: false });
+        } else {
+            await updateStats({ xp: 10 });
+        }
+    }, [hasRewarded, mode, updateStats]);
+
+    if (winner && !hasRewarded) {
+        handleRewards(winner);
+    }
 
     const isMyTurn = mode === 'local' ? true : mode === 'ai' ? currentTurn === 'X' : true;
 
@@ -129,6 +149,7 @@ export default function TicTacToe({ mode, onExit }: TicTacToeProps) {
         setCurrentTurn('X');
         setWinner(null);
         setWinningLine(null);
+        setHasRewarded(false);
     };
 
     return (
@@ -136,8 +157,8 @@ export default function TicTacToe({ mode, onExit }: TicTacToeProps) {
             {/* Player indicators */}
             <div className="flex justify-between w-full max-w-md items-center text-xl font-display text-white">
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${currentTurn === 'X' && !winner
-                        ? 'text-[var(--primary)] bg-[var(--primary)]/10 border border-[var(--primary)]/50 scale-105'
-                        : 'opacity-50'
+                    ? 'text-[var(--primary)] bg-[var(--primary)]/10 border border-[var(--primary)]/50 scale-105'
+                    : 'opacity-50'
                     }`}>
                     <User size={24} />
                     <span>YOU</span>
@@ -145,8 +166,8 @@ export default function TicTacToe({ mode, onExit }: TicTacToeProps) {
                 </div>
                 <div className="text-2xl font-mono text-gray-500">VS</div>
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${currentTurn === 'O' && !winner
-                        ? 'text-[var(--secondary)] bg-[var(--secondary)]/10 border border-[var(--secondary)]/50 scale-105'
-                        : 'opacity-50'
+                    ? 'text-[var(--secondary)] bg-[var(--secondary)]/10 border border-[var(--secondary)]/50 scale-105'
+                    : 'opacity-50'
                     }`}>
                     <Circle size={20} className="text-[var(--secondary)]" />
                     <span>{mode === 'ai' ? 'AI' : 'P2'}</span>

@@ -17,12 +17,48 @@ export function Shop() {
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [loading, setLoading] = useState<string | null>(null);
 
+    const purchaseGems = useMutation(api.payments.purchaseGems);
+    const subscribePremium = useMutation(api.payments.subscribePremium);
+
     if (!shopItems || !profile) {
         return (
             <div className="flex items-center justify-center p-12">
                 <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
             </div>
         );
+    }
+
+    const handleBuyGems = async () => {
+        setLoading("buy_gems");
+        try {
+            await purchaseGems({
+                gemAmount: 500,
+                pricePaid: 4.99,
+                provider: "test_gateway",
+                receipt: "mock_receipt_" + Math.random().toString(36).substring(7)
+            });
+            toast.success("500 Gems successfully synchronized!");
+        } catch (e: any) {
+            toast.error(e.message);
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleSubscribe = async () => {
+        setLoading("nitro");
+        try {
+            await subscribePremium({
+                planId: "monthly",
+                provider: "test_gateway",
+                receipt: "mock_receipt_premium_" + Math.random().toString(36).substring(7)
+            });
+            toast.success("ELITE STATUS ACTIVATED!");
+        } catch (e: any) {
+            toast.error(e.message);
+        } finally {
+            setLoading(null);
+        }
     }
 
     const handlePurchase = async (itemId: any) => {
@@ -86,8 +122,12 @@ export function Shop() {
                             <h3 className="text-2xl font-bold">{profile.gems}</h3>
                         </div>
                     </div>
-                    <button className="bg-cyan-500 hover:bg-cyan-400 text-black px-3 py-1 rounded-lg text-xs font-bold transition-colors">
-                        BUY GEMS
+                    <button
+                        onClick={handleBuyGems}
+                        disabled={loading === "buy_gems"}
+                        className="bg-cyan-500 hover:bg-cyan-400 text-black px-3 py-1 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 flex items-center gap-1"
+                    >
+                        {loading === "buy_gems" ? <Loader2 className="w-3 h-3 animate-spin" /> : "BUY GEMS"}
                     </button>
                 </motion.div>
 
@@ -108,8 +148,12 @@ export function Shop() {
                             </h3>
                         </div>
                     </div>
-                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl text-xs font-black tracking-widest hover:scale-105 transition-transform">
-                        NITRO
+                    <button
+                        onClick={handleSubscribe}
+                        disabled={loading === "nitro" || profile.isPremium}
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl text-xs font-black tracking-widest hover:scale-105 transition-transform disabled:opacity-50 flex items-center gap-1"
+                    >
+                        {loading === "nitro" ? <Loader2 className="w-3 h-3 animate-spin" /> : "NITRO"}
                     </button>
                 </motion.div>
             </div>
@@ -149,8 +193,8 @@ export function Shop() {
                             <div className="space-y-1">
                                 <div className="flex items-center justify-between">
                                     <span className={`text-[10px] font-black uppercase ${item.rarity === 'legendary' ? 'text-amber-400' :
-                                            item.rarity === 'epic' ? 'text-purple-400' :
-                                                item.rarity === 'rare' ? 'text-cyan-400' : 'text-zinc-500'
+                                        item.rarity === 'epic' ? 'text-purple-400' :
+                                            item.rarity === 'rare' ? 'text-cyan-400' : 'text-zinc-500'
                                         }`}>
                                         {item.rarity}
                                     </span>

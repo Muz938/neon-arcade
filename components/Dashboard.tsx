@@ -1,6 +1,8 @@
 "use client";
 import { useGame } from "@/lib/GameContext";
-import { LogOut, Trophy, User, Gamepad2, ShoppingBag, Package, Shield, Coins, Gem, Menu, X } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { LogOut, Trophy, User, Gamepad2, ShoppingBag, Package, Shield, Coins, Gem, Menu, X, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import GameCard from "./GameCard";
@@ -10,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
     const { signOut, profile } = useGame();
+    const leaderboard = useQuery(api.users.getLeaderboard);
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<"games" | "shop" | "inventory">("games");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -126,17 +129,15 @@ export default function Dashboard() {
                                         <Trophy className="text-yellow-500" /> WORLD RANKINGS
                                     </h3>
                                     <div className="space-y-3">
-                                        {[
-                                            { rank: 1, name: "NeonMaster", xp: 12900, skin: "Diamond" },
-                                            { rank: 2, name: "CyberWolf", xp: 9750, skin: "Gold" },
-                                            { rank: 3, name: profile.name, xp: profile.xp, skin: "Current" },
-                                        ].map((player, idx) => (
+                                        {!leaderboard ? (
+                                            <div className="flex justify-center p-8"><Loader2 className="animate-spin text-zinc-700" /></div>
+                                        ) : leaderboard.map((player: any, idx) => (
                                             <div key={idx} className="flex items-center justify-between p-4 bg-zinc-950/50 border border-zinc-900 rounded-2xl">
                                                 <div className="flex items-center gap-4">
-                                                    <span className={`text-xl font-black italic ${idx === 0 ? 'text-yellow-500' : 'text-zinc-600'}`}>#0{player.rank}</span>
+                                                    <span className={`text-xl font-black italic ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-zinc-400' : idx === 2 ? 'text-amber-600' : 'text-zinc-600'}`}>#0{idx + 1}</span>
                                                     <div>
-                                                        <p className="font-bold text-sm uppercase">{player.name}</p>
-                                                        <p className="text-[10px] font-black text-zinc-600 tracking-widest">{player.xp} XP / {player.skin} SKIN</p>
+                                                        <p className="font-bold text-sm uppercase">{player.name} {player.userId === profile.userId && '(YOU)'}</p>
+                                                        <p className="text-[10px] font-black text-zinc-600 tracking-widest">{player.xp} XP • LVL {player.level}</p>
                                                     </div>
                                                 </div>
                                                 <button className="text-[10px] font-black text-cyan-500 border border-cyan-500/30 px-3 py-1 rounded-lg hover:bg-cyan-500 hover:text-black transition-all">VIEW</button>
