@@ -5,7 +5,7 @@ import { Mail, Github, Chrome, Phone, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
-    const { signIn } = useGame();
+    const { signIn, guestLogin } = useGame();
     const [isLoading, setIsLoading] = useState<string | null>(null);
     const [email, setEmail] = useState("");
     const [showEmailInput, setShowEmailInput] = useState(false);
@@ -25,10 +25,7 @@ export default function Login() {
     const handleGuestAccess = async () => {
         setIsLoading("guest");
         try {
-            const guestId = Math.random().toString(36).substring(2, 10);
-            const email = `guest_${guestId}@arcadenexus.ai`;
-            // Using a static but internal password for guest sessions
-            await signIn("password", { email, password: "guest-password-internal", flow: "signUp" });
+            await guestLogin();
             toast.success("Guest link initialized!");
         } catch (e: any) {
             toast.error("Failed to initialize guest link.");

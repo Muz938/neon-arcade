@@ -4,11 +4,21 @@ import { Password } from "@convex-dev/auth/providers/Password";
 
 export const { auth, signIn, signOut, store } = convexAuth({
     providers: [
-        Google as any,
-        Password,
-        // Email Provider for OTP/Link
-        // Password({ id: "email-link", verify: Email }), 
-        // Phone Provider using OTP logic
-        // For a real app, you'd configure a transport like Twilio here.
+        Google({
+            clientId: process.env.AUTH_GOOGLE_ID,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET,
+            profile(profile) {
+                return {
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                };
+            },
+        }) as any,
+        Password({
+            id: "password",
+            // You can add password reset or verification logic here
+        }),
     ],
 });
