@@ -42,12 +42,12 @@ export const createOrGetProfile = mutation({
         const newProfileId = await ctx.db.insert("profiles", {
             userId,
             xp: 0,
-            coins: 100,
+            coins: 500, // Starting coins
+            gems: 50,   // Starting gems
             level: 1,
             wins: 0,
             losses: 0,
             rank: "Rookie",
-            inventory: ["default"],
             isPremium: false,
         });
 

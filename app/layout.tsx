@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     description: 'The ultimate futuristic multiplayer gaming platform',
 };
 
+import { ConvexClientProvider } from './ConvexClientProvider';
+
 export default function RootLayout({
     children,
 }: {
@@ -19,9 +21,11 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.variable} ${orbitron.variable}`}>
-                <GameProvider>
-                    {children}
-                </GameProvider>
+                <ConvexClientProvider>
+                    <GameProvider>
+                        {children}
+                    </GameProvider>
+                </ConvexClientProvider>
             </body>
         </html>
     );

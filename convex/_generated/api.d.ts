@@ -11,6 +11,9 @@
 import type * as auth from "../auth.js";
 import type * as games from "../games.js";
 import type * as http from "../http.js";
+import type * as payments from "../payments.js";
+import type * as seed from "../seed.js";
+import type * as shop from "../shop.js";
 import type * as users from "../users.js";
 
 import type {
@@ -23,6 +26,9 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   games: typeof games;
   http: typeof http;
+  payments: typeof payments;
+  seed: typeof seed;
+  shop: typeof shop;
   users: typeof users;
 }>;
 

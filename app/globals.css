@@ -64,3 +64,30 @@ h6 {
 .btn-primary:hover {
     @apply bg-primary text-black shadow-[0_0_20px_var(--primary-glow)];
 }
+
+.nitro-card {
+    background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(235, 69, 158, 0.1) 100%);
+    border: 1px solid rgba(235, 69, 158, 0.3);
+}
+
+.legendary-glow {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    border-color: rgba(251, 191, 36, 0.5) !important;
+}
+
+.animate-pulse-glow {
+    animation: glow-pulse 2s infinite ease-in-out;
+}
+
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 20px var(--primary);
+    }
+}
